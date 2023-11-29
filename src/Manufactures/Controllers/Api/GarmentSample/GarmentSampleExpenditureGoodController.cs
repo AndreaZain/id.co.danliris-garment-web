@@ -1,5 +1,6 @@
 ﻿using Barebone.Controllers;
 using Infrastructure.Data.EntityFrameworkCore.Utilities;
+using Manufactures.Application.GarmentExpenditureGoods.Queries.GetSampleExpenditureGoodsForOmzet;
 using Manufactures.Application.GarmentSample.SampleExpenditureGoods.Queries;
 using Manufactures.Application.GarmentSample.SampleExpenditureGoods.Queries.ArchiveMonitoring;
 using Manufactures.Domain.GarmentSample.SampleExpenditureGoods.Commands;
@@ -445,6 +446,23 @@ namespace Manufactures.Controllers.Api.GarmentSample
             }
         }
         //
+
+        [HttpGet("for-garment-omzet")]
+        public async Task<IActionResult> GetOmzetReport(DateTime dateFrom, DateTime dateTo, string unitcode, int offset)
+        {
+            VerifyUser();
+            //var DateFrom = dateFrom != DateTime.MinValue ? new DateTime(dateFrom.Year, dateFrom.Day, dateFrom.Month) : DateTime.MinValue;
+            //var DateTo = dateTo != DateTime.MinValue ? new DateTime(dateTo.Year, dateTo.Day, dateTo.Month) : DateTime.MinValue;
+
+            GetSampleExpenditureGoodsForOmzetQuery query = new GetSampleExpenditureGoodsForOmzetQuery(dateFrom, dateTo, unitcode, offset, WorkContext.Token);
+            var viewModel = await Mediator.Send(query);
+
+            return Ok(viewModel.garmentReports, info: new
+            {
+                viewModel.count
+            });
+        }
+
         [HttpGet("forOmzet")]
         public async Task<IActionResult> GetExpenditureForOmzet(DateTime dateFrom, DateTime dateTo, string unitcode, int offset)
         {

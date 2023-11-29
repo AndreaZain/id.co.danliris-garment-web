@@ -1,6 +1,7 @@
 ﻿using Barebone.Controllers;
 using Infrastructure.Data.EntityFrameworkCore.Utilities;
 using Manufactures.Application.GarmentExpenditureGoods.Queries;
+using Manufactures.Application.GarmentExpenditureGoods.Queries.GetExpenditureGoodsForOmzet;
 using Manufactures.Application.GarmentExpenditureGoods.Queries.GetMonitoringWithCreatedUTC;
 using Manufactures.Application.GarmentExpenditureGoods.Queries.GetMutationExpenditureGoods;
 using Manufactures.Application.GarmentExpenditureGoods.Queries.GetReportExpenditureGoods;
@@ -531,6 +532,22 @@ namespace Manufactures.Controllers.Api
 
             await Task.Yield();
             return Ok(garmentExpenditureGoodListDtos);
+        }
+
+        [HttpGet("for-garment-omzet")]
+        public async Task<IActionResult> GetOmzetReport(DateTime dateFrom, DateTime dateTo, string unitcode, int offset)
+        {
+            VerifyUser();
+            //var DateFrom = dateFrom != DateTime.MinValue ? new DateTime(dateFrom.Year, dateFrom.Day, dateFrom.Month) : DateTime.MinValue;
+            //var DateTo = dateTo != DateTime.MinValue ? new DateTime(dateTo.Year, dateTo.Day, dateTo.Month) : DateTime.MinValue;
+
+            GetExpenditureGoodsForOmzetQuery query = new GetExpenditureGoodsForOmzetQuery(dateFrom, dateTo, unitcode, offset, WorkContext.Token);
+            var viewModel = await Mediator.Send(query);
+
+            return Ok(viewModel.garmentReports, info: new
+            {
+                viewModel.count
+            });
         }
 
         [HttpGet("forOmzet")]
